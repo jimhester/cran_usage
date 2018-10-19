@@ -1,0 +1,144 @@
+---
+title: Query function usage by package dependencies
+output: github_document
+params:
+  package:
+    label: "Package:"
+    value: glue
+---
+
+```{r, echo = FALSE, message = FALSE}
+library(tidyverse)
+```
+
+```{r, echo = FALSE}
+pkg <- params$package
+
+Sys.setenv(PKG = params$package)
+write_lines(str_glue("{devtools::revdep(pkg)}_"), str_glue("{pkg}_revdeps"))
+```
+
+```{bash, echo = FALSE}
+# update CRAN mirror
+rsync -q -t --delete -d --include='*tar.gz' cran.r-project.org::CRAN/src/contrib/ cran
+
+# Delete the broken symlinks
+find cran -type l -exec test ! -e {} \; -delete
+
+# Construct search patterns
+
+echo "$PKG::[[:alnum:]_.]+
+importFrom\(${PKG}[, ]+[[:alnum:]_.]+\)
+import\($PKG\)" > search
+
+# Search for function usage in all reverse dependencies
+find -L cran -name '*tar.gz' |
+  grep -Ff ${PKG}_revdeps |
+  xargs -P 8 -n 1 -J % \
+    gtar xf % --wildcards '*NAMESPACE' '*/R/*' \
+      --to-command 'egrep -o -H --label="$TAR_FILENAME" -f search; true' \
+  > ${PKG}_usage ; true
+```
+
+```{r, echo = FALSE}
+usage <- read_lines(str_glue("{pkg}_usage"))
+
+imports <- grep("NAMESPACE:import", usage, value = TRUE)
+
+raw_calls <- grep("NAMESPACE:import", usage, value = TRUE, invert = TRUE)
+
+calls <-
+  as_tibble(raw_calls) %>%
+    extract(value, c("file", "fun"), regex = "(.*R)?:?\\w+::(.*)") %>%
+    fill(file) %>%
+    extract(file, c("pkg", "file"), regex = "(\\w+)/(.*)")
+```
+
+# Call analysis
+
+The following counts are all from explicit calls to your package, e.g. `pkg::foo()`.
+
+## Packages with most calls
+These are generally the packages which are the heaviest users of your package.
+
+```{r}
+calls %>% count(pkg) %>% arrange(desc(n))
+```
+
+## Functions most called
+There are the functions from your package dependencies are using most frequently.
+
+```{r}
+calls %>% 
+  count(fun) %>% 
+  mutate(percent = scales::percent(n / sum(n))) %>%
+  arrange(desc(n)) %>% 
+  head(20)
+```
+
+## How many packages use each function
+This helps determine how broad function usage is across packages.
+```{r}
+calls %>%
+  select(pkg, fun) %>%
+  unique() %>%
+  count(fun) %>%
+  mutate(percent = scales::percent(n / sum(n))) %>%
+  arrange(desc(n)) %>%
+  head(20)
+```
+
+# Imports
+
+The following counts come from dependencies which explicitly import functions from your package with `importFrom()` or `import()`.  While we don't see how often they are using each function in this case, we can see which functions are being imported.
+
+```{r, echo = FALSE}
+raw_imports <- grep("NAMESPACE:import", usage, value = TRUE)
+
+full_imports <- grep("NAMESPACE:import\\(", raw_imports, value = TRUE) %>%
+  sub("/NAMESPACE.*", "", .)
+```
+
+## Packages with full imports
+
+`r length(full_imports)` have 'full' imports, with `import(pkg)` in their NAMESPACE. It is difficult to determine function usage of these packages.
+
+```{r}
+full_imports
+```
+
+```{r, echo = FALSE}
+selective_imports <-
+  grep("importFrom", imports, value = TRUE) %>%
+    as_tibble() %>%
+    extract(value, c("pkg", "fun"), "^(\\w+).*,([[:alpha:]._]+)\\)$")
+```
+
+## Pkgs with most functions imported
+```{r}
+selective_imports %>% count(pkg) %>% arrange(desc(n))
+```
+
+## Which functions are most often imported?
+
+These are the functions which your dependencies find most useful.
+
+```{r}
+selective_imports %>%
+  count(fun) %>%
+  mutate(percent = scales::percent(n / sum(n))) %>%
+  arrange(desc(n)) %>%
+  head(20)
+```
+
+## Which functions are never used by dependencies?
+
+These are the functions no dependency is using either by calls or importing. These functions either need better documentation / publicity, are meant for interactive use rather than in packages, or do not provide a useful function and should be considered for removal.
+
+```{r}
+exports <- getNamespaceExports(pkg)
+
+exports[
+  !exports %in% c(calls$fun, selective_imports$fun)
+]
+```
