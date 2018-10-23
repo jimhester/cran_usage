@@ -1,4 +1,4 @@
-Query function usage by package dependencies
+Query function usage by reverse dependencies
 ================
 
 # Call analysis
@@ -6,10 +6,10 @@ Query function usage by package dependencies
 The following counts are all from explicit calls to your package, e.g.
 `pkg::foo()`.
 
-## Packages with most calls
+## Reverse dependencies with most calls
 
-These are generally the packages which are the heaviest users of your
-package.
+These are generally the reverse dependencies which are the heaviest
+users of your package.
 
 ``` r
 calls %>% count(pkg) %>% arrange(desc(n))
@@ -32,8 +32,8 @@ calls %>% count(pkg) %>% arrange(desc(n))
 
 ## Functions most called
 
-There are the functions from your package dependencies are using most
-frequently.
+There are the functions from your package reverse dependencies are using
+most frequently.
 
 ``` r
 calls %>% 
@@ -55,7 +55,7 @@ calls %>%
     ## 7 glue_sql          1 0.2%   
     ## 8 single_quote      1 0.2%
 
-## How many packages use each function
+## How many reverse dependencies use each function
 
 This helps determine how broad function usage is across packages.
 
@@ -64,7 +64,7 @@ calls %>%
   select(pkg, fun) %>%
   unique() %>%
   count(fun) %>%
-  mutate(percent = scales::percent(n / sum(n))) %>%
+  mutate(percent = scales::percent(n / length(revdeps))) %>%
   arrange(desc(n)) %>%
   head(20)
 ```
@@ -72,9 +72,9 @@ calls %>%
     ## # A tibble: 8 x 3
     ##   fun               n percent
     ##   <chr>         <int> <chr>  
-    ## 1 glue             55 72.4%  
-    ## 2 glue_collapse     9 11.8%  
-    ## 3 glue_data         5 6.6%   
+    ## 1 glue             55 71.4%  
+    ## 2 glue_collapse     9 11.7%  
+    ## 3 glue_data         5 6.5%   
     ## 4 collapse          3 3.9%   
     ## 5 backtick          1 1.3%   
     ## 6 double_quote      1 1.3%   
@@ -83,23 +83,20 @@ calls %>%
 
 # Imports
 
-The following counts come from dependencies which explicitly import
-functions from your package with `importFrom()` or `import()`. While we
-don’t see how often they are using each function in this case, we can
-see which functions are being imported.
+The following counts come from reverse dependencies which explicitly
+import functions from your package with `importFrom()` or `import()`.
+While we don’t see how often they are using each function in this case,
+we can see which functions are being imported.
 
-## Packages with full imports
+## Reverse dependencies with full imports
 
-2 have ‘full’ imports, with `import(pkg)` in their NAMESPACE. It is
-difficult to determine function usage of these packages.
-
-``` r
-full_imports
-```
+2 reverse dependencies have ‘full’ imports, with `import(pkg)` in their
+NAMESPACE. It is difficult to determine function usage of these
+packages.
 
     ## [1] "configr" "togglr"
 
-## Pkgs with most functions imported
+## Reverse dependencies with the most functions imported
 
 ``` r
 selective_imports %>% count(pkg) %>% arrange(desc(n))
@@ -122,7 +119,8 @@ selective_imports %>% count(pkg) %>% arrange(desc(n))
 
 ## Which functions are most often imported?
 
-These are the functions which your dependencies find most useful.
+These are generally the functions which your reverse dependencies find
+most useful.
 
 ``` r
 selective_imports %>%
@@ -140,12 +138,12 @@ selective_imports %>%
     ## 3 glue_data         3 7.1%   
     ## 4 glue_sql          1 2.4%
 
-## Which functions are never used by dependencies?
+## Which functions are never used by reverse dependencies?
 
-These are the functions no dependency is using either by calls or
-importing. These functions either need better documentation / publicity,
-are meant for interactive use rather than in packages, or do not provide
-a useful function and should be considered for removal.
+These are the functions no reverse dependency is using either by calls
+or importing. These functions either need better documentation /
+publicity, are meant for interactive use rather than in packages, or do
+not provide a useful function and should be considered for removal.
 
 ``` r
 exports <- getNamespaceExports(pkg)

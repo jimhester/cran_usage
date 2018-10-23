@@ -1,44 +1,39 @@
-Query function usage by package dependencies
+Query function usage by reverse dependencies
 ================
-
-    ## gtar: */R/*: Not found in archive
-    ## gtar: Exiting with failure status due to previous errors
-    ## gtar: */R/*: Not found in archive
-    ## gtar: Exiting with failure status due to previous errors
 
 # Call analysis
 
 The following counts are all from explicit calls to your package, e.g.
 `pkg::foo()`.
 
-## Packages with most calls
+## Reverse dependencies with most calls
 
-These are generally the packages which are the heaviest users of your
-package.
+These are generally the reverse dependencies which are the heaviest
+users of your package.
 
 ``` r
 calls %>% count(pkg) %>% arrange(desc(n))
 ```
 
-    ## # A tibble: 700 x 2
+    ## # A tibble: 701 x 2
     ##    pkg                  n
     ##    <chr>            <int>
     ##  1 landscapemetrics  1603
-    ##  2 DiagrammeR        1136
-    ##  3 xpose              444
+    ##  2 DiagrammeR        1124
+    ##  3 xpose              443
     ##  4 datasus            350
-    ##  5 tidyhydat          340
-    ##  6 ggstatsplot        256
-    ##  7 rubias             251
-    ##  8 atlantistools      245
+    ##  5 tidyhydat          327
+    ##  6 atlantistools      271
+    ##  7 ggstatsplot        256
+    ##  8 rubias             251
     ##  9 heemod             230
     ## 10 tsibble            205
-    ## # ... with 690 more rows
+    ## # ... with 691 more rows
 
 ## Functions most called
 
-There are the functions from your package dependencies are using most
-frequently.
+There are the functions from your package reverse dependencies are using
+most frequently.
 
 ``` r
 calls %>% 
@@ -72,7 +67,7 @@ calls %>%
     ## 19 as_tibble    255 1.3%   
     ## 20 distinct     187 0.9%
 
-## How many packages use each function
+## How many reverse dependencies use each function
 
 This helps determine how broad function usage is across packages.
 
@@ -81,7 +76,7 @@ calls %>%
   select(pkg, fun) %>%
   unique() %>%
   count(fun) %>%
-  mutate(percent = scales::percent(n / sum(n))) %>%
+  mutate(percent = scales::percent(n / length(unique(calls$pkg)))) %>%
   arrange(desc(n)) %>%
   head(20)
 ```
@@ -89,49 +84,46 @@ calls %>%
     ## # A tibble: 20 x 3
     ##    fun            n percent
     ##    <chr>      <int> <chr>  
-    ##  1 filter       306 6.56%  
-    ##  2 mutate       301 6.45%  
-    ##  3 select       282 6.04%  
-    ##  4 bind_rows    266 5.70%  
-    ##  5 group_by     212 4.54%  
-    ##  6 left_join    165 3.54%  
-    ##  7 arrange      147 3.15%  
-    ##  8 ungroup      133 2.85%  
-    ##  9 summarise    122 2.61%  
-    ## 10 bind_cols    111 2.38%  
-    ## 11 select_      109 2.34%  
-    ## 12 rename       105 2.25%  
-    ## 13 group_by_     96 2.06%  
-    ## 14 data_frame    89 1.91%  
-    ## 15 distinct      81 1.74%  
-    ## 16 inner_join    76 1.63%  
-    ## 17 mutate_       76 1.63%  
-    ## 18 filter_       73 1.56%  
-    ## 19 slice         66 1.41%  
-    ## 20 summarize     66 1.41%
+    ##  1 filter       304 43.4%  
+    ##  2 mutate       300 42.8%  
+    ##  3 select       285 40.7%  
+    ##  4 bind_rows    266 37.9%  
+    ##  5 group_by     211 30.1%  
+    ##  6 left_join    165 23.5%  
+    ##  7 arrange      146 20.8%  
+    ##  8 ungroup      133 19.0%  
+    ##  9 summarise    124 17.7%  
+    ## 10 bind_cols    110 15.7%  
+    ## 11 select_      108 15.4%  
+    ## 12 rename       105 15.0%  
+    ## 13 group_by_     97 13.8%  
+    ## 14 data_frame    89 12.7%  
+    ## 15 distinct      81 11.6%  
+    ## 16 inner_join    75 10.7%  
+    ## 17 mutate_       75 10.7%  
+    ## 18 filter_       73 10.4%  
+    ## 19 slice         67 9.6%   
+    ## 20 summarize     66 9.4%
 
 # Imports
 
-The following counts come from dependencies which explicitly import
-functions from your package with `importFrom()` or `import()`. While we
-don’t see how often they are using each function in this case, we can
-see which functions are being imported.
+The following counts come from reverse dependencies which explicitly
+import functions from your package with `importFrom()` or `import()`.
+While we don’t see how often they are using each function in this case,
+we can see which functions are being imported.
 
-## Packages with full imports
+## Reverse dependencies with full imports
 
-247 have ‘full’ imports, with `import(pkg)` in their NAMESPACE. It is
-difficult to determine function usage of these packages.
-
-``` r
-full_imports
-```
+247 reverse dependencies have ‘full’ imports, with `import(pkg)` in
+their NAMESPACE. It is difficult to determine function usage of these
+packages.
 
     ##   [1] "bupaR"                       "splithalf"                  
     ##   [3] "electoral"                   "caffsim"                    
     ##   [5] "tbrf"                        "robis"                      
     ##   [7] "WRTDStidal"                  "valr"                       
     ##   [9] "Rraven"                      "ggsom"                      
-    ##  [11] "CRANsearcher"                "benthos"                    
+    ##  [11] "benthos"                     "CRANsearcher"               
     ##  [13] "survivalAnalysis"            "refund.shiny"               
     ##  [15] "toxplot"                     "IDE"                        
     ##  [17] "PWFSLSmoke"                  "ezsummary"                  
@@ -173,8 +165,8 @@ full_imports
     ##  [89] "lans2r"                      "gender"                     
     ##  [91] "spotifyr"                    "platetools"                 
     ##  [93] "treeplyr"                    "processmapR"                
-    ##  [95] "imdbapi"                     "macleish"                   
-    ##  [97] "tidybayes"                   "mnreadR"                    
+    ##  [95] "imdbapi"                     "tidybayes"                  
+    ##  [97] "macleish"                    "mnreadR"                    
     ##  [99] "xmrr"                        "adaptalint"                 
     ## [101] "PHEindicatormethods"         "rtypeform"                  
     ## [103] "wfindr"                      "fingertipscharts"           
@@ -192,7 +184,7 @@ full_imports
     ## [127] "ubeR"                        "longurl"                    
     ## [129] "jpndistrict"                 "trelliscopejs"              
     ## [131] "didrooRFM"                   "dsr"                        
-    ## [133] "dlookr"                      "RSSL"                       
+    ## [133] "RSSL"                        "dlookr"                     
     ## [135] "Plasmidprofiler"             "LendingClub"                
     ## [137] "SWMPrExtension"              "bootnet"                    
     ## [139] "staRdom"                     "finreportr"                 
@@ -231,8 +223,8 @@ full_imports
     ## [205] "MLZ"                         "keyholder"                  
     ## [207] "goldi"                       "REddyProc"                  
     ## [209] "shinyHeatmaply"              "psychmeta"                  
-    ## [211] "feedeR"                      "crawl"                      
-    ## [213] "breathtestcore"              "msigdbr"                    
+    ## [211] "feedeR"                      "breathtestcore"             
+    ## [213] "crawl"                       "msigdbr"                    
     ## [215] "morse"                       "ahpsurvey"                  
     ## [217] "flatr"                       "rusk"                       
     ## [219] "dexter"                      "proPubBills"                
@@ -251,7 +243,7 @@ full_imports
     ## [245] "gitgadget"                   "IAT"                        
     ## [247] "idealstan"
 
-## Pkgs with most functions imported
+## Reverse dependencies with the most functions imported
 
 ``` r
 selective_imports %>% count(pkg) %>% arrange(desc(n))
@@ -274,7 +266,8 @@ selective_imports %>% count(pkg) %>% arrange(desc(n))
 
 ## Which functions are most often imported?
 
-These are the functions which your dependencies find most useful.
+These are generally the functions which your reverse dependencies find
+most useful.
 
 ``` r
 selective_imports %>%
@@ -308,12 +301,12 @@ selective_imports %>%
     ## 19 mutate_       39 1.43%  
     ## 20 distinct      37 1.36%
 
-## Which functions are never used by dependencies?
+## Which functions are never used by reverse dependencies?
 
-These are the functions no dependency is using either by calls or
-importing. These functions either need better documentation / publicity,
-are meant for interactive use rather than in packages, or do not provide
-a useful function and should be considered for removal.
+These are the functions no reverse dependency is using either by calls
+or importing. These functions either need better documentation /
+publicity, are meant for interactive use rather than in packages, or do
+not provide a useful function and should be considered for removal.
 
 ``` r
 exports <- getNamespaceExports(pkg)

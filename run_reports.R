@@ -4,6 +4,7 @@ render_report <- function(package) {
     params = list(
       package = package
     ),
-    output_file = paste0("reports/", package, "-usage.md")
+    output_file = paste0("reports/", package, "-usage.md"),
+    run_pandoc = FALSE
   )
 }

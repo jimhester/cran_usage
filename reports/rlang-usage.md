@@ -1,4 +1,4 @@
-Query function usage by package dependencies
+Query function usage by reverse dependencies
 ================
 
 # Call analysis
@@ -6,10 +6,10 @@ Query function usage by package dependencies
 The following counts are all from explicit calls to your package, e.g.
 `pkg::foo()`.
 
-## Packages with most calls
+## Reverse dependencies with most calls
 
-These are generally the packages which are the heaviest users of your
-package.
+These are generally the reverse dependencies which are the heaviest
+users of your package.
 
 ``` r
 calls %>% count(pkg) %>% arrange(desc(n))
@@ -18,9 +18,9 @@ calls %>% count(pkg) %>% arrange(desc(n))
     ## # A tibble: 171 x 2
     ##    pkg              n
     ##    <chr>        <int>
-    ##  1 DiagrammeR     271
+    ##  1 DiagrammeR     260
     ##  2 ggstatsplot    175
-    ##  3 sparklyr       156
+    ##  3 sparklyr       155
     ##  4 healthcareai    90
     ##  5 tailr           89
     ##  6 pointblank      72
@@ -32,8 +32,8 @@ calls %>% count(pkg) %>% arrange(desc(n))
 
 ## Functions most called
 
-There are the functions from your package dependencies are using most
-frequently.
+There are the functions from your package reverse dependencies are using
+most frequently.
 
 ``` r
 calls %>% 
@@ -67,7 +67,7 @@ calls %>%
     ## 19 as_function       24 0.9%   
     ## 20 ensym             24 0.9%
 
-## How many packages use each function
+## How many reverse dependencies use each function
 
 This helps determine how broad function usage is across packages.
 
@@ -76,7 +76,7 @@ calls %>%
   select(pkg, fun) %>%
   unique() %>%
   count(fun) %>%
-  mutate(percent = scales::percent(n / sum(n))) %>%
+  mutate(percent = scales::percent(n / length(revdeps))) %>%
   arrange(desc(n)) %>%
   head(20)
 ```
@@ -84,42 +84,39 @@ calls %>%
     ## # A tibble: 20 x 3
     ##    fun                n percent
     ##    <chr>          <int> <chr>  
-    ##  1 enquo             58 7.56%  
-    ##  2 sym               36 4.69%  
-    ##  3 quo_name          33 4.30%  
-    ##  4 eval_tidy         32 4.17%  
-    ##  5 quos              31 4.04%  
-    ##  6 syms              31 4.04%  
-    ##  7 quo               21 2.74%  
-    ##  8 set_names         15 1.96%  
-    ##  9 expr              14 1.83%  
-    ## 10 f_rhs             12 1.56%  
-    ## 11 as_function       11 1.43%  
-    ## 12 as_quosure        11 1.43%  
-    ## 13 is_formula        11 1.43%  
-    ## 14 is_true           11 1.43%  
-    ## 15 expr_text         10 1.30%  
-    ## 16 exprs             10 1.30%  
-    ## 17 is_null           10 1.30%  
-    ## 18 parse_expr        10 1.30%  
-    ## 19 abort              9 1.17%  
-    ## 20 quasiquotation     9 1.17%
+    ##  1 enquo             56 18.4%  
+    ##  2 sym               36 11.8%  
+    ##  3 quo_name          33 10.8%  
+    ##  4 eval_tidy         31 10.2%  
+    ##  5 syms              31 10.2%  
+    ##  6 quos              30 9.8%   
+    ##  7 quo               21 6.9%   
+    ##  8 set_names         15 4.9%   
+    ##  9 expr              14 4.6%   
+    ## 10 as_function       12 3.9%   
+    ## 11 as_quosure        11 3.6%   
+    ## 12 f_rhs             11 3.6%   
+    ## 13 is_formula        11 3.6%   
+    ## 14 is_true           11 3.6%   
+    ## 15 expr_text         10 3.3%   
+    ## 16 exprs             10 3.3%   
+    ## 17 is_null           10 3.3%   
+    ## 18 parse_expr        10 3.3%   
+    ## 19 abort              9 3.0%   
+    ## 20 quasiquotation     9 3.0%
 
 # Imports
 
-The following counts come from dependencies which explicitly import
-functions from your package with `importFrom()` or `import()`. While we
-don’t see how often they are using each function in this case, we can
-see which functions are being imported.
+The following counts come from reverse dependencies which explicitly
+import functions from your package with `importFrom()` or `import()`.
+While we don’t see how often they are using each function in this case,
+we can see which functions are being imported.
 
-## Packages with full imports
+## Reverse dependencies with full imports
 
-57 have ‘full’ imports, with `import(pkg)` in their NAMESPACE. It is
-difficult to determine function usage of these packages.
-
-``` r
-full_imports
-```
+57 reverse dependencies have ‘full’ imports, with `import(pkg)` in their
+NAMESPACE. It is difficult to determine function usage of these
+packages.
 
     ##  [1] "fabricatr"        "profile"          "tbrf"            
     ##  [4] "tidyr"            "gestalt"          "survivalAnalysis"
@@ -141,7 +138,7 @@ full_imports
     ## [52] "malariaAtlas"     "conflicted"       "tidytext"        
     ## [55] "bayesplot"        "sugrrants"        "testthat"
 
-## Pkgs with most functions imported
+## Reverse dependencies with the most functions imported
 
 ``` r
 selective_imports %>% count(pkg) %>% arrange(desc(n))
@@ -164,7 +161,8 @@ selective_imports %>% count(pkg) %>% arrange(desc(n))
 
 ## Which functions are most often imported?
 
-These are the functions which your dependencies find most useful.
+These are generally the functions which your reverse dependencies find
+most useful.
 
 ``` r
 selective_imports %>%
@@ -198,12 +196,12 @@ selective_imports %>%
     ## 19 expr_text        4 0.9%   
     ## 20 is_lang          4 0.9%
 
-## Which functions are never used by dependencies?
+## Which functions are never used by reverse dependencies?
 
-These are the functions no dependency is using either by calls or
-importing. These functions either need better documentation / publicity,
-are meant for interactive use rather than in packages, or do not provide
-a useful function and should be considered for removal.
+These are the functions no reverse dependency is using either by calls
+or importing. These functions either need better documentation /
+publicity, are meant for interactive use rather than in packages, or do
+not provide a useful function and should be considered for removal.
 
 ``` r
 exports <- getNamespaceExports(pkg)

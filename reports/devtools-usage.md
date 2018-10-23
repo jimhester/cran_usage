@@ -1,4 +1,4 @@
-Query function usage by package dependencies
+Query function usage by reverse dependencies
 ================
 
 # Call analysis
@@ -6,10 +6,10 @@ Query function usage by package dependencies
 The following counts are all from explicit calls to your package, e.g.
 `pkg::foo()`.
 
-## Packages with most calls
+## Reverse dependencies with most calls
 
-These are generally the packages which are the heaviest users of your
-package.
+These are generally the reverse dependencies which are the heaviest
+users of your package.
 
 ``` r
 calls %>% count(pkg) %>% arrange(desc(n))
@@ -18,12 +18,12 @@ calls %>% count(pkg) %>% arrange(desc(n))
     ## # A tibble: 81 x 2
     ##    pkg                n
     ##    <chr>          <int>
-    ##  1 adapr             21
-    ##  2 workflowr         16
-    ##  3 testthis          15
-    ##  4 RSuite            14
-    ##  5 testthat          14
-    ##  6 RxODE             13
+    ##  1 adapr             20
+    ##  2 testthis          15
+    ##  3 RSuite            14
+    ##  4 testthat          14
+    ##  5 RxODE             13
+    ##  6 segclust2d        13
     ##  7 pkgmaker          12
     ##  8 packagedocs       11
     ##  9 exampletestr      10
@@ -32,8 +32,8 @@ calls %>% count(pkg) %>% arrange(desc(n))
 
 ## Functions most called
 
-There are the functions from your package dependencies are using most
-frequently.
+There are the functions from your package reverse dependencies are using
+most frequently.
 
 ``` r
 calls %>% 
@@ -67,7 +67,7 @@ calls %>%
     ## 19 install_deps        3 1.0%   
     ## 20 loaded_packages     3 1.0%
 
-## How many packages use each function
+## How many reverse dependencies use each function
 
 This helps determine how broad function usage is across packages.
 
@@ -76,7 +76,7 @@ calls %>%
   select(pkg, fun) %>%
   unique() %>%
   count(fun) %>%
-  mutate(percent = scales::percent(n / sum(n))) %>%
+  mutate(percent = scales::percent(n / length(revdeps))) %>%
   arrange(desc(n)) %>%
   head(20)
 ```
@@ -84,50 +84,46 @@ calls %>%
     ## # A tibble: 20 x 3
     ##    fun                 n percent
     ##    <chr>           <int> <chr>  
-    ##  1 install_github     29 17.5%  
-    ##  2 document           13 7.8%   
-    ##  3 load_all           12 7.2%   
-    ##  4 as.package          9 5.4%   
-    ##  5 test                9 5.4%   
-    ##  6 install             7 4.2%   
-    ##  7 use_data            7 4.2%   
-    ##  8 check               6 3.6%   
-    ##  9 session_info        6 3.6%   
-    ## 10 build               5 3.0%   
-    ## 11 create              4 2.4%   
-    ## 12 install_version     4 2.4%   
-    ## 13 package_file        4 2.4%   
-    ## 14 github_pat          3 1.8%   
-    ## 15 build_vignettes     2 1.2%   
-    ## 16 build_win           2 1.2%   
-    ## 17 github_pull         2 1.2%   
-    ## 18 inst                2 1.2%   
-    ## 19 install_deps        2 1.2%   
-    ## 20 loaded_packages     2 1.2%
+    ##  1 install_github     29 11.4%  
+    ##  2 document           13 5.1%   
+    ##  3 load_all           12 4.7%   
+    ##  4 as.package          9 3.5%   
+    ##  5 test                9 3.5%   
+    ##  6 install             7 2.8%   
+    ##  7 use_data            7 2.8%   
+    ##  8 check               6 2.4%   
+    ##  9 session_info        6 2.4%   
+    ## 10 build               5 2.0%   
+    ## 11 create              4 1.6%   
+    ## 12 install_version     4 1.6%   
+    ## 13 package_file        4 1.6%   
+    ## 14 github_pat          3 1.2%   
+    ## 15 build_vignettes     2 0.8%   
+    ## 16 build_win           2 0.8%   
+    ## 17 github_pull         2 0.8%   
+    ## 18 inst                2 0.8%   
+    ## 19 install_deps        2 0.8%   
+    ## 20 loaded_packages     2 0.8%
 
 # Imports
 
-The following counts come from dependencies which explicitly import
-functions from your package with `importFrom()` or `import()`. While we
-don’t see how often they are using each function in this case, we can
-see which functions are being imported.
+The following counts come from reverse dependencies which explicitly
+import functions from your package with `importFrom()` or `import()`.
+While we don’t see how often they are using each function in this case,
+we can see which functions are being imported.
 
-## Packages with full imports
+## Reverse dependencies with full imports
 
-10 have ‘full’ imports, with `import(pkg)` in their NAMESPACE. It is
-difficult to determine function usage of these
-    packages.
-
-``` r
-full_imports
-```
+10 reverse dependencies have ‘full’ imports, with `import(pkg)` in their
+NAMESPACE. It is difficult to determine function usage of these
+packages.
 
     ##  [1] "uavRmp"              "Orcs"                "wru"                
     ##  [4] "RSuite"              "understandBPMN"      "Ricetl"             
     ##  [7] "reproducible"        "soilcarbon"          "populationPDXdesign"
     ## [10] "creditr"
 
-## Pkgs with most functions imported
+## Reverse dependencies with the most functions imported
 
 ``` r
 selective_imports %>% count(pkg) %>% arrange(desc(n))
@@ -150,7 +146,8 @@ selective_imports %>% count(pkg) %>% arrange(desc(n))
 
 ## Which functions are most often imported?
 
-These are the functions which your dependencies find most useful.
+These are generally the functions which your reverse dependencies find
+most useful.
 
 ``` r
 selective_imports %>%
@@ -183,12 +180,12 @@ selective_imports %>%
     ## 18 session_info          1 2.7%   
     ## 19 use_cran_badge        1 2.7%
 
-## Which functions are never used by dependencies?
+## Which functions are never used by reverse dependencies?
 
-These are the functions no dependency is using either by calls or
-importing. These functions either need better documentation / publicity,
-are meant for interactive use rather than in packages, or do not provide
-a useful function and should be considered for removal.
+These are the functions no reverse dependency is using either by calls
+or importing. These functions either need better documentation /
+publicity, are meant for interactive use rather than in packages, or do
+not provide a useful function and should be considered for removal.
 
 ``` r
 exports <- getNamespaceExports(pkg)

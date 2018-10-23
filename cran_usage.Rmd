@@ -1,5 +1,5 @@
 ---
-title: Query function usage by package dependencies
+title: Query function usage by reverse dependencies
 output: github_document
 params:
   package:
@@ -15,10 +15,13 @@ library(tidyverse)
 pkg <- params$package
 
 Sys.setenv(PKG = params$package)
-write_lines(str_glue("{devtools::revdep(pkg)}_"), str_glue("{pkg}_revdeps"))
+
+revdeps <- devtools::revdep(pkg)
+
+write_lines(str_glue("{revdeps}_"), str_glue("{pkg}_revdeps"))
 ```
 
-```{bash, echo = FALSE}
+```{bash, echo = FALSE, results = FALSE}
 # update CRAN mirror
 rsync -q -t --delete -d --include='*tar.gz' cran.r-project.org::CRAN/src/contrib/ cran
 
@@ -58,15 +61,16 @@ calls <-
 
 The following counts are all from explicit calls to your package, e.g. `pkg::foo()`.
 
-## Packages with most calls
-These are generally the packages which are the heaviest users of your package.
+## Reverse dependencies with most calls
+These are generally the reverse dependencies which are the heaviest users of your package.
 
 ```{r}
 calls %>% count(pkg) %>% arrange(desc(n))
 ```
 
 ## Functions most called
-There are the functions from your package dependencies are using most frequently.
+
+There are the functions from your package reverse dependencies are using most frequently.
 
 ```{r}
 calls %>% 
@@ -76,21 +80,21 @@ calls %>%
   head(20)
 ```
 
-## How many packages use each function
+## How many reverse dependencies use each function
 This helps determine how broad function usage is across packages.
 ```{r}
 calls %>%
   select(pkg, fun) %>%
   unique() %>%
   count(fun) %>%
-  mutate(percent = scales::percent(n / sum(n))) %>%
+  mutate(percent = scales::percent(n / length(unique(calls$pkg)))) %>%
   arrange(desc(n)) %>%
   head(20)
 ```
 
 # Imports
 
-The following counts come from dependencies which explicitly import functions from your package with `importFrom()` or `import()`.  While we don't see how often they are using each function in this case, we can see which functions are being imported.
+The following counts come from reverse dependencies which explicitly import functions from your package with `importFrom()` or `import()`.  While we don't see how often they are using each function in this case, we can see which functions are being imported.
 
 ```{r, echo = FALSE}
 raw_imports <- grep("NAMESPACE:import", usage, value = TRUE)
@@ -99,11 +103,11 @@ full_imports <- grep("NAMESPACE:import\\(", raw_imports, value = TRUE) %>%
   sub("/NAMESPACE.*", "", .)
 ```
 
-## Packages with full imports
+## Reverse dependencies with full imports
 
-`r length(full_imports)` have 'full' imports, with `import(pkg)` in their NAMESPACE. It is difficult to determine function usage of these packages.
+`r length(full_imports)` reverse dependencies have 'full' imports, with `import(pkg)` in their NAMESPACE. It is difficult to determine function usage of these packages.
 
-```{r}
+```{r, echo = FALSE}
 full_imports
 ```
 
@@ -114,26 +118,26 @@ selective_imports <-
     extract(value, c("pkg", "fun"), "^(\\w+).*,([[:alpha:]._]+)\\)$")
 ```
 
-## Pkgs with most functions imported
+## Reverse dependencies with the most functions imported
 ```{r}
 selective_imports %>% count(pkg) %>% arrange(desc(n))
 ```
 
 ## Which functions are most often imported?
 
-These are the functions which your dependencies find most useful.
+These are generally the functions which your reverse dependencies find most useful.
 
 ```{r}
 selective_imports %>%
   count(fun) %>%
-  mutate(percent = scales::percent(n / sum(n))) %>%
+  mutate(percent = scales::percent(n / length(unique(selective_imports$pkg)))) %>%
   arrange(desc(n)) %>%
   head(20)
 ```
 
-## Which functions are never used by dependencies?
+## Which functions are never used by reverse dependencies?
 
-These are the functions no dependency is using either by calls or importing. These functions either need better documentation / publicity, are meant for interactive use rather than in packages, or do not provide a useful function and should be considered for removal.
+These are the functions no reverse dependency is using either by calls or importing. These functions either need better documentation / publicity, are meant for interactive use rather than in packages, or do not provide a useful function and should be considered for removal.
 
 ```{r}
 exports <- getNamespaceExports(pkg)

@@ -1,4 +1,4 @@
-Query function usage by package dependencies
+Query function usage by reverse dependencies
 ================
 
 # Call analysis
@@ -6,10 +6,10 @@ Query function usage by package dependencies
 The following counts are all from explicit calls to your package, e.g.
 `pkg::foo()`.
 
-## Packages with most calls
+## Reverse dependencies with most calls
 
-These are generally the packages which are the heaviest users of your
-package.
+These are generally the reverse dependencies which are the heaviest
+users of your package.
 
 ``` r
 calls %>% count(pkg) %>% arrange(desc(n))
@@ -30,8 +30,8 @@ calls %>% count(pkg) %>% arrange(desc(n))
 
 ## Functions most called
 
-There are the functions from your package dependencies are using most
-frequently.
+There are the functions from your package reverse dependencies are using
+most frequently.
 
 ``` r
 calls %>% 
@@ -65,7 +65,7 @@ calls %>%
     ## 19 use_github              2 1.4%   
     ## 20 use_github_links        2 1.4%
 
-## How many packages use each function
+## How many reverse dependencies use each function
 
 This helps determine how broad function usage is across packages.
 
@@ -74,7 +74,7 @@ calls %>%
   select(pkg, fun) %>%
   unique() %>%
   count(fun) %>%
-  mutate(percent = scales::percent(n / sum(n))) %>%
+  mutate(percent = scales::percent(n / length(revdeps))) %>%
   arrange(desc(n)) %>%
   head(20)
 ```
@@ -82,46 +82,43 @@ calls %>%
     ## # A tibble: 20 x 3
     ##    fun                     n percent
     ##    <chr>               <int> <chr>  
-    ##  1 proj_get                5 8.93%  
-    ##  2 use_directory           5 8.93%  
-    ##  3 create_package          4 7.14%  
-    ##  4 use_build_ignore        4 7.14%  
-    ##  5 proj_set                3 5.36%  
-    ##  6 use_testthat            3 5.36%  
-    ##  7 use_git                 2 3.57%  
-    ##  8 use_git_hook            2 3.57%  
-    ##  9 use_git_ignore          2 3.57%  
-    ## 10 use_test                2 3.57%  
-    ## 11 edit_r_profile          1 1.79%  
-    ## 12 use_appveyor            1 1.79%  
-    ## 13 use_code_of_conduct     1 1.79%  
-    ## 14 use_coverage            1 1.79%  
-    ## 15 use_cran_badge          1 1.79%  
-    ## 16 use_cran_comments       1 1.79%  
-    ## 17 use_data                1 1.79%  
-    ## 18 use_data_raw            1 1.79%  
-    ## 19 use_description         1 1.79%  
-    ## 20 use_dev_version         1 1.79%
+    ##  1 proj_get                5 41.7%  
+    ##  2 use_directory           5 41.7%  
+    ##  3 create_package          4 33.3%  
+    ##  4 use_build_ignore        4 33.3%  
+    ##  5 proj_set                3 25.0%  
+    ##  6 use_testthat            3 25.0%  
+    ##  7 use_git                 2 16.7%  
+    ##  8 use_git_hook            2 16.7%  
+    ##  9 use_git_ignore          2 16.7%  
+    ## 10 use_test                2 16.7%  
+    ## 11 edit_r_profile          1 8.3%   
+    ## 12 use_appveyor            1 8.3%   
+    ## 13 use_code_of_conduct     1 8.3%   
+    ## 14 use_coverage            1 8.3%   
+    ## 15 use_cran_badge          1 8.3%   
+    ## 16 use_cran_comments       1 8.3%   
+    ## 17 use_data                1 8.3%   
+    ## 18 use_data_raw            1 8.3%   
+    ## 19 use_description         1 8.3%   
+    ## 20 use_dev_version         1 8.3%
 
 # Imports
 
-The following counts come from dependencies which explicitly import
-functions from your package with `importFrom()` or `import()`. While we
-don’t see how often they are using each function in this case, we can
-see which functions are being imported.
+The following counts come from reverse dependencies which explicitly
+import functions from your package with `importFrom()` or `import()`.
+While we don’t see how often they are using each function in this case,
+we can see which functions are being imported.
 
-## Packages with full imports
+## Reverse dependencies with full imports
 
-2 have ‘full’ imports, with `import(pkg)` in their NAMESPACE. It is
-difficult to determine function usage of these packages.
-
-``` r
-full_imports
-```
+2 reverse dependencies have ‘full’ imports, with `import(pkg)` in their
+NAMESPACE. It is difficult to determine function usage of these
+packages.
 
     ## [1] "prodigenr"         "uCAREChemSuiteCLI"
 
-## Pkgs with most functions imported
+## Reverse dependencies with the most functions imported
 
 ``` r
 selective_imports %>% count(pkg) %>% arrange(desc(n))
@@ -136,7 +133,8 @@ selective_imports %>% count(pkg) %>% arrange(desc(n))
 
 ## Which functions are most often imported?
 
-These are the functions which your dependencies find most useful.
+These are generally the functions which your reverse dependencies find
+most useful.
 
 ``` r
 selective_imports %>%
@@ -159,12 +157,12 @@ selective_imports %>%
     ## 8 use_rstudio          1 10.0%  
     ## 9 use_testthat         1 10.0%
 
-## Which functions are never used by dependencies?
+## Which functions are never used by reverse dependencies?
 
-These are the functions no dependency is using either by calls or
-importing. These functions either need better documentation / publicity,
-are meant for interactive use rather than in packages, or do not provide
-a useful function and should be considered for removal.
+These are the functions no reverse dependency is using either by calls
+or importing. These functions either need better documentation /
+publicity, are meant for interactive use rather than in packages, or do
+not provide a useful function and should be considered for removal.
 
 ``` r
 exports <- getNamespaceExports(pkg)
