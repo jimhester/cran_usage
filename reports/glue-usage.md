@@ -46,9 +46,9 @@ calls %>%
     ## # A tibble: 8 x 3
     ##   fun               n percent
     ##   <chr>         <int> <chr>  
-    ## 1 glue            525 90.7%  
+    ## 1 glue            531 90.8%  
     ## 2 glue_collapse    21 3.6%   
-    ## 3 collapse         16 2.8%   
+    ## 3 collapse         16 2.7%   
     ## 4 glue_data        10 1.7%   
     ## 5 double_quote      4 0.7%   
     ## 6 backtick          1 0.2%   
@@ -64,7 +64,7 @@ calls %>%
   select(pkg, fun) %>%
   unique() %>%
   count(fun) %>%
-  mutate(percent = scales::percent(n / length(revdeps))) %>%
+  mutate(percent = scales::percent(n / length(unique(calls$pkg)))) %>%
   arrange(desc(n)) %>%
   head(20)
 ```
@@ -72,14 +72,14 @@ calls %>%
     ## # A tibble: 8 x 3
     ##   fun               n percent
     ##   <chr>         <int> <chr>  
-    ## 1 glue             55 71.4%  
-    ## 2 glue_collapse     9 11.7%  
-    ## 3 glue_data         5 6.5%   
-    ## 4 collapse          3 3.9%   
-    ## 5 backtick          1 1.3%   
-    ## 6 double_quote      1 1.3%   
-    ## 7 glue_sql          1 1.3%   
-    ## 8 single_quote      1 1.3%
+    ## 1 glue             55 93.2%  
+    ## 2 glue_collapse     9 15.3%  
+    ## 3 glue_data         5 8.5%   
+    ## 4 collapse          3 5.1%   
+    ## 5 backtick          1 1.7%   
+    ## 6 double_quote      1 1.7%   
+    ## 7 glue_sql          1 1.7%   
+    ## 8 single_quote      1 1.7%
 
 # Imports
 
@@ -107,14 +107,14 @@ selective_imports %>% count(pkg) %>% arrange(desc(n))
     ##    <chr>       <int>
     ##  1 radiant         3
     ##  2 dials           2
-    ##  3 googledrive     2
-    ##  4 rtypeform       2
-    ##  5 textclean       2
-    ##  6 biolink         1
-    ##  7 bjscrapeR       1
-    ##  8 blastula        1
-    ##  9 blorr           1
-    ## 10 bupaR           1
+    ##  3 fiery           2
+    ##  4 googledrive     2
+    ##  5 rtypeform       2
+    ##  6 textclean       2
+    ##  7 biolink         1
+    ##  8 bjscrapeR       1
+    ##  9 blastula        1
+    ## 10 blorr           1
     ## # ... with 26 more rows
 
 ## Which functions are most often imported?
@@ -125,7 +125,7 @@ most useful.
 ``` r
 selective_imports %>%
   count(fun) %>%
-  mutate(percent = scales::percent(n / sum(n))) %>%
+  mutate(percent = scales::percent(n / length(unique(selective_imports$pkg)))) %>%
   arrange(desc(n)) %>%
   head(20)
 ```
@@ -133,10 +133,10 @@ selective_imports %>%
     ## # A tibble: 4 x 3
     ##   fun               n percent
     ##   <chr>         <int> <chr>  
-    ## 1 glue             34 81.0%  
-    ## 2 glue_collapse     4 9.5%   
-    ## 3 glue_data         3 7.1%   
-    ## 4 glue_sql          1 2.4%
+    ## 1 glue             34 94.4%  
+    ## 2 glue_collapse     4 11.1%  
+    ## 3 glue_data         4 11.1%  
+    ## 4 glue_sql          1 2.8%
 
 ## Which functions are never used by reverse dependencies?
 

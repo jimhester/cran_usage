@@ -1,10 +1,15 @@
 render_report <- function(package) {
-  rmarkdown::render(
+  out <- rmarkdown::render(
     "cran_usage.Rmd",
     params = list(
       package = package
     ),
-    output_file = paste0("reports/", package, "-usage.md"),
-    run_pandoc = FALSE
+    clean = TRUE
   )
+  output_file <- paste0("reports/", package, "-usage.md")
+
+  file.copy(out, output_file, overwrite = TRUE)
+  unlink(out)
+
+  invisible(output_file)
 }

@@ -74,7 +74,7 @@ calls %>%
   select(pkg, fun) %>%
   unique() %>%
   count(fun) %>%
-  mutate(percent = scales::percent(n / length(revdeps))) %>%
+  mutate(percent = scales::percent(n / length(unique(calls$pkg)))) %>%
   arrange(desc(n)) %>%
   head(20)
 ```
@@ -82,26 +82,26 @@ calls %>%
     ## # A tibble: 20 x 3
     ##    fun                     n percent
     ##    <chr>               <int> <chr>  
-    ##  1 proj_get                5 41.7%  
-    ##  2 use_directory           5 41.7%  
-    ##  3 create_package          4 33.3%  
-    ##  4 use_build_ignore        4 33.3%  
-    ##  5 proj_set                3 25.0%  
-    ##  6 use_testthat            3 25.0%  
-    ##  7 use_git                 2 16.7%  
-    ##  8 use_git_hook            2 16.7%  
-    ##  9 use_git_ignore          2 16.7%  
-    ## 10 use_test                2 16.7%  
-    ## 11 edit_r_profile          1 8.3%   
-    ## 12 use_appveyor            1 8.3%   
-    ## 13 use_code_of_conduct     1 8.3%   
-    ## 14 use_coverage            1 8.3%   
-    ## 15 use_cran_badge          1 8.3%   
-    ## 16 use_cran_comments       1 8.3%   
-    ## 17 use_data                1 8.3%   
-    ## 18 use_data_raw            1 8.3%   
-    ## 19 use_description         1 8.3%   
-    ## 20 use_dev_version         1 8.3%
+    ##  1 proj_get                5 55.6%  
+    ##  2 use_directory           5 55.6%  
+    ##  3 create_package          4 44.4%  
+    ##  4 use_build_ignore        4 44.4%  
+    ##  5 proj_set                3 33.3%  
+    ##  6 use_testthat            3 33.3%  
+    ##  7 use_git                 2 22.2%  
+    ##  8 use_git_hook            2 22.2%  
+    ##  9 use_git_ignore          2 22.2%  
+    ## 10 use_test                2 22.2%  
+    ## 11 edit_r_profile          1 11.1%  
+    ## 12 use_appveyor            1 11.1%  
+    ## 13 use_code_of_conduct     1 11.1%  
+    ## 14 use_coverage            1 11.1%  
+    ## 15 use_cran_badge          1 11.1%  
+    ## 16 use_cran_comments       1 11.1%  
+    ## 17 use_data                1 11.1%  
+    ## 18 use_data_raw            1 11.1%  
+    ## 19 use_description         1 11.1%  
+    ## 20 use_dev_version         1 11.1%
 
 # Imports
 
@@ -139,7 +139,7 @@ most useful.
 ``` r
 selective_imports %>%
   count(fun) %>%
-  mutate(percent = scales::percent(n / sum(n))) %>%
+  mutate(percent = scales::percent(n / length(unique(selective_imports$pkg)))) %>%
   arrange(desc(n)) %>%
   head(20)
 ```
@@ -147,15 +147,15 @@ selective_imports %>%
     ## # A tibble: 9 x 3
     ##   fun                  n percent
     ##   <chr>            <int> <chr>  
-    ## 1 proj_get             2 20.0%  
-    ## 2 create_package       1 10.0%  
-    ## 3 proj_set             1 10.0%  
-    ## 4 use_build_ignore     1 10.0%  
-    ## 5 use_data_raw         1 10.0%  
-    ## 6 use_directory        1 10.0%  
-    ## 7 use_git_ignore       1 10.0%  
-    ## 8 use_rstudio          1 10.0%  
-    ## 9 use_testthat         1 10.0%
+    ## 1 proj_get             2 66.7%  
+    ## 2 create_package       1 33.3%  
+    ## 3 proj_set             1 33.3%  
+    ## 4 use_build_ignore     1 33.3%  
+    ## 5 use_data_raw         1 33.3%  
+    ## 6 use_directory        1 33.3%  
+    ## 7 use_git_ignore       1 33.3%  
+    ## 8 use_rstudio          1 33.3%  
+    ## 9 use_testthat         1 33.3%
 
 ## Which functions are never used by reverse dependencies?
 

@@ -15,20 +15,20 @@ users of your package.
 calls %>% count(pkg) %>% arrange(desc(n))
 ```
 
-    ## # A tibble: 81 x 2
+    ## # A tibble: 80 x 2
     ##    pkg                n
     ##    <chr>          <int>
-    ##  1 adapr             20
-    ##  2 testthis          15
-    ##  3 RSuite            14
-    ##  4 testthat          14
+    ##  1 testthat          25
+    ##  2 adapr             21
+    ##  3 testthis          15
+    ##  4 RSuite            14
     ##  5 RxODE             13
-    ##  6 segclust2d        13
-    ##  7 pkgmaker          12
-    ##  8 packagedocs       11
-    ##  9 exampletestr      10
-    ## 10 understandBPMN    10
-    ## # ... with 71 more rows
+    ##  6 pkgmaker          12
+    ##  7 packagedocs       11
+    ##  8 exampletestr      10
+    ##  9 understandBPMN    10
+    ## 10 installr           9
+    ## # ... with 70 more rows
 
 ## Functions most called
 
@@ -46,14 +46,14 @@ calls %>%
     ## # A tibble: 20 x 3
     ##    fun                 n percent
     ##    <chr>           <int> <chr>  
-    ##  1 install_github     54 17.7%  
-    ##  2 document           30 9.8%   
-    ##  3 load_all           23 7.5%   
-    ##  4 test               19 6.2%   
-    ##  5 as.package         17 5.6%   
-    ##  6 package_file       17 5.6%   
-    ##  7 use_data           15 4.9%   
-    ##  8 session_info       12 3.9%   
+    ##  1 install_github     53 17.7%  
+    ##  2 document           31 10.4%  
+    ##  3 load_all           23 7.7%   
+    ##  4 test               19 6.4%   
+    ##  5 as.package         17 5.7%   
+    ##  6 package_file       17 5.7%   
+    ##  7 use_data           15 5.0%   
+    ##  8 session_info       12 4.0%   
     ##  9 install            10 3.3%   
     ## 10 clean_source        9 3.0%   
     ## 11 check               7 2.3%   
@@ -61,7 +61,7 @@ calls %>%
     ## 13 build               6 2.0%   
     ## 14 create              6 2.0%   
     ## 15 install_version     6 2.0%   
-    ## 16 inst                5 1.6%   
+    ## 16 inst                5 1.7%   
     ## 17 github_pat          4 1.3%   
     ## 18 install_bioc        4 1.3%   
     ## 19 install_deps        3 1.0%   
@@ -76,7 +76,7 @@ calls %>%
   select(pkg, fun) %>%
   unique() %>%
   count(fun) %>%
-  mutate(percent = scales::percent(n / length(revdeps))) %>%
+  mutate(percent = scales::percent(n / length(unique(calls$pkg)))) %>%
   arrange(desc(n)) %>%
   head(20)
 ```
@@ -84,26 +84,26 @@ calls %>%
     ## # A tibble: 20 x 3
     ##    fun                 n percent
     ##    <chr>           <int> <chr>  
-    ##  1 install_github     29 11.4%  
-    ##  2 document           13 5.1%   
-    ##  3 load_all           12 4.7%   
-    ##  4 as.package          9 3.5%   
-    ##  5 test                9 3.5%   
-    ##  6 install             7 2.8%   
-    ##  7 use_data            7 2.8%   
-    ##  8 check               6 2.4%   
-    ##  9 session_info        6 2.4%   
-    ## 10 build               5 2.0%   
-    ## 11 create              4 1.6%   
-    ## 12 install_version     4 1.6%   
-    ## 13 package_file        4 1.6%   
-    ## 14 github_pat          3 1.2%   
-    ## 15 build_vignettes     2 0.8%   
-    ## 16 build_win           2 0.8%   
-    ## 17 github_pull         2 0.8%   
-    ## 18 inst                2 0.8%   
-    ## 19 install_deps        2 0.8%   
-    ## 20 loaded_packages     2 0.8%
+    ##  1 install_github     27 33.8%  
+    ##  2 document           13 16.2%  
+    ##  3 load_all           12 15.0%  
+    ##  4 as.package          9 11.2%  
+    ##  5 test                9 11.2%  
+    ##  6 use_data            7 8.7%   
+    ##  7 check               6 7.5%   
+    ##  8 install             6 7.5%   
+    ##  9 session_info        6 7.5%   
+    ## 10 build               5 6.2%   
+    ## 11 create              4 5.0%   
+    ## 12 install_version     4 5.0%   
+    ## 13 package_file        4 5.0%   
+    ## 14 github_pat          3 3.8%   
+    ## 15 build_vignettes     2 2.5%   
+    ## 16 build_win           2 2.5%   
+    ## 17 inst                2 2.5%   
+    ## 18 install_deps        2 2.5%   
+    ## 19 loaded_packages     2 2.5%   
+    ## 20 release             2 2.5%
 
 # Imports
 
@@ -129,7 +129,7 @@ packages.
 selective_imports %>% count(pkg) %>% arrange(desc(n))
 ```
 
-    ## # A tibble: 24 x 2
+    ## # A tibble: 23 x 2
     ##    pkg                     n
     ##    <chr>               <int>
     ##  1 DataPackageR            4
@@ -138,11 +138,11 @@ selective_imports %>% count(pkg) %>% arrange(desc(n))
     ##  4 easypackages            2
     ##  5 githubinstall           2
     ##  6 microsamplingDesign     2
-    ##  7 msgtools                2
-    ##  8 packagedocs             2
-    ##  9 rbundler                2
-    ## 10 teachingApps            2
-    ## # ... with 14 more rows
+    ##  7 packagedocs             2
+    ##  8 rbundler                2
+    ##  9 teachingApps            2
+    ## 10 BioInstaller            1
+    ## # ... with 13 more rows
 
 ## Which functions are most often imported?
 
@@ -152,33 +152,32 @@ most useful.
 ``` r
 selective_imports %>%
   count(fun) %>%
-  mutate(percent = scales::percent(n / sum(n))) %>%
+  mutate(percent = scales::percent(n / length(unique(selective_imports$pkg)))) %>%
   arrange(desc(n)) %>%
   head(20)
 ```
 
-    ## # A tibble: 19 x 3
+    ## # A tibble: 18 x 3
     ##    fun                   n percent
     ##    <chr>             <int> <chr>  
-    ##  1 install_github       12 32.4%  
-    ##  2 as.package            4 10.8%  
-    ##  3 install               2 5.4%   
-    ##  4 install_cran          2 5.4%   
-    ##  5 load_all              2 5.4%   
-    ##  6 parse_deps            2 5.4%   
-    ##  7 build                 1 2.7%   
-    ##  8 build_vignettes       1 2.7%   
-    ##  9 create                1 2.7%   
-    ## 10 dev_mode              1 2.7%   
-    ## 11 dev_package_deps      1 2.7%   
-    ## 12 document              1 2.7%   
-    ## 13 github_pull           1 2.7%   
-    ## 14 install_bitbucket     1 2.7%   
-    ## 15 install_url           1 2.7%   
-    ## 16 package_file          1 2.7%   
-    ## 17 reload                1 2.7%   
-    ## 18 session_info          1 2.7%   
-    ## 19 use_cran_badge        1 2.7%
+    ##  1 install_github       12 52.2%  
+    ##  2 as.package            3 13.0%  
+    ##  3 install               2 8.7%   
+    ##  4 install_cran          2 8.7%   
+    ##  5 load_all              2 8.7%   
+    ##  6 parse_deps            2 8.7%   
+    ##  7 build                 1 4.3%   
+    ##  8 build_vignettes       1 4.3%   
+    ##  9 dev_mode              1 4.3%   
+    ## 10 dev_package_deps      1 4.3%   
+    ## 11 document              1 4.3%   
+    ## 12 github_pull           1 4.3%   
+    ## 13 install_bitbucket     1 4.3%   
+    ## 14 install_url           1 4.3%   
+    ## 15 package_file          1 4.3%   
+    ## 16 reload                1 4.3%   
+    ## 17 session_info          1 4.3%   
+    ## 18 use_cran_badge        1 4.3%
 
 ## Which functions are never used by reverse dependencies?
 
@@ -221,12 +220,12 @@ exports[
     ## [47] "install_dev_deps"            "test_coverage"              
     ## [49] "devtest"                     "use_appveyor"               
     ## [51] "use_git_hook"                "revdep_check_reset"         
-    ## [53] "use_news_md"                 "setup"                      
-    ## [55] "test_coverage_file"          "use_rstudio"                
-    ## [57] "check_dep_version"           "submit_cran"                
-    ## [59] "install_gitlab"              "check_win_oldrelease"       
-    ## [61] "unload"                      "revdep_maintainers"         
-    ## [63] "has_tests"                   "system_output"              
-    ## [65] "system_check"                "lint"                       
-    ## [67] "revdep_check"                "source_gist"                
-    ## [69] "check_win_release"
+    ## [53] "use_news_md"                 "github_release"             
+    ## [55] "setup"                       "test_coverage_file"         
+    ## [57] "use_rstudio"                 "check_dep_version"          
+    ## [59] "submit_cran"                 "install_gitlab"             
+    ## [61] "check_win_oldrelease"        "unload"                     
+    ## [63] "revdep_maintainers"          "has_tests"                  
+    ## [65] "system_output"               "system_check"               
+    ## [67] "lint"                        "revdep_check"               
+    ## [69] "source_gist"                 "check_win_release"
